@@ -14,7 +14,7 @@ services:
   routerfleet:
     container_name: routerfleet
     restart: unless-stopped
-    image: abnerdavi/routerfleet-labautomation:latest
+    image: abnerdavi/routerfleet:latest
     environment:
       - SERVER_ADDRESS=${SERVER_ADDRESS}
       - DEBUG_MODE=${DEBUG_MODE}
