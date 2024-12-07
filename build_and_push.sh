@@ -1,10 +1,10 @@
 #!/bin/bash
 
 IMAGES=(
-  "eduardosilva/routerfleet:latest"
-  "eduardosilva/routerfleet-monitoring:latest"
-  "eduardosilva/routerfleet-nginx:latest"
-  "eduardosilva/routerfleet-cron:latest"
+  "abnerdavi/routerfleet:latest"
+  "abnerdavi/routerfleet-monitoring:latest"
+  "abnerdavi/routerfleet-nginx:latest"
+  "abnerdavi/routerfleet-cron:latest"
 )
 
 build_images() {
