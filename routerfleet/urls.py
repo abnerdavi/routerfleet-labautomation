@@ -63,5 +63,5 @@ urlpatterns = [
     path('message_center/manage_settings/', view_manage_message_settings, name='manage_message_settings'),
     path('message_center/manage_channel/', view_manage_message_channel, name='manage_message_channel'),
     path('message_center/message_history/', view_message_history, name='message_history'),
-    path('labautomation/hello_world/', view_message_history, name='hello_world'),
+    path('labautomation/hello_world/', hello_world, name='hello_world'),
 ]
