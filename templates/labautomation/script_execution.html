@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
 {%  block content %}
-    <h1>Execução de Scripts</h1>
+    <h1>LAB Automation</h1>
     <form id="script-form" method="post">
         {% csrf_token %}
-        <label for="option">Escolha um script:</label>
+        <label for="option">Escolha um laboratorio para aplicar:</label>
         <select id="option" name="option">
-            <option value="1">Script 1</option>
-            <option value="2">Script 2</option>
-            <option value="3">Script 3</option>
-            <option value="4">Script 4</option>
+            <option value="1">LAB 1</option>
+            <option value="2">LAB 2</option>
+            <option value="3">LAB 3</option>
+            <option value="4">LAB 4</option>
         </select>
         <button type="submit">Executar</button>
     </form>

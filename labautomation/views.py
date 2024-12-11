@@ -10,10 +10,10 @@ def script_execution(request):
     if request.method == "POST":
         script_option = request.POST.get("option")
         scripts = {
-            "1": "script1.sh",
-            "2": "script2.sh",
-            "3": "script3.sh",
-            "4": "script4.sh",
+            "1": "pb_lab1.yml",
+            "2": "pb_lab2.yml",
+            "3": "pb_lab3.yml",
+            "4": "pb_lab4.yml",
         }
         selected_script = scripts.get(script_option)
 
@@ -21,7 +21,7 @@ def script_execution(request):
             try:
                 # Executar o script no Bash
                 result = subprocess.run(
-                    ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", f"bash {selected_script}"],
+                    ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", f"ansible-playbook /home/lab/labAutomation/playbooks/{selected_script}"],
                     capture_output=True,
                     text=True,
                 )
