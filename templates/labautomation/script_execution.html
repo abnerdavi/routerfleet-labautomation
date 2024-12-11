@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{%  block content %}
+    <h1>Execução de Scripts</h1>
+    <form id="script-form" method="post">
+        {% csrf_token %}
+        <label for="option">Escolha um script:</label>
+        <select id="option" name="option">
+            <option value="1">Script 1</option>
+            <option value="2">Script 2</option>
+            <option value="3">Script 3</option>
+            <option value="4">Script 4</option>
+        </select>
+        <button type="submit">Executar</button>
+    </form>
+    <div id="output">
+        <script>
+            document.getElementById('script-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch('', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const outputDiv = document.getElementById('output');
+                    if (data.error) {
+                        outputDiv.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+                    } else {
+                        outputDiv.innerHTML = `<pre>${data.output}</pre>`;
+                    }
+                });
+            });
+        </script>
+    </div>
+{% endblock %}
