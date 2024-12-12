@@ -13,25 +13,34 @@
         </select>
         <button type="submit">Executar</button>
     </form>
-    <div id="output">
-        <script>
-            document.getElementById('script-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                fetch('', {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const outputDiv = document.getElementById('output');
-                    if (data.error) {
-                        outputDiv.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
-                    } else {
-                        outputDiv.innerHTML = `<pre>${data.output}</pre>`;
-                    }
-                });
+    <div id="output"></div>
+    <script>
+        document.getElementById('script-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            // Limpar a saída anterior
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<p>Executando script...</p>';
+
+            fetch('', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const outputDiv = document.getElementById('output');
+                if (data.error) {
+                    outputDiv.innerHTML = `<pre style="color: red;">${data.error}</pre>`;
+                } else {
+                    // Formatar a saída mantendo a formatação e quebrando linhas
+                    outputDiv.innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word;">${data.output}</pre>`;
+                }
+            })
+            .catch(error => {
+                outputDiv.innerHTML = `<pre style="color: red;">Erro na execução: ${error}</pre>`;
             });
-        </script>
-    </div>
+        });
+    </script>
+    
 {% endblock %}

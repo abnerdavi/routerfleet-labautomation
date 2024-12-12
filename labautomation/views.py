@@ -3,9 +3,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import subprocess
 
-def hello_world(request):
-    return HttpResponse("Hello, World! Bem-vindo à LabAutomation by Routerfleet!")
-
 def script_execution(request):
     if request.method == "POST":
         script_option = request.POST.get("option")
@@ -25,9 +22,18 @@ def script_execution(request):
                     capture_output=True,
                     text=True,
                 )
-                output = result.stdout
-                error = result.stderr
-                return JsonResponse({"output": output, "error": error})
+
+                combined_output = ""
+                if result.stdout:
+                    combined_output += result.stdout
+                if result.stderr:
+                    combined_output += "\nErros:\n" + result.stderr
+                
+                # Se não houver saída, adicionar uma mensagem
+                if not combined_output:
+                    combined_output = "O script foi executado, mas não produziu nenhuma saída."
+                
+                return JsonResponse({"output": combined_output})
             except Exception as e:
                 return JsonResponse({"error": str(e)})
         else:
