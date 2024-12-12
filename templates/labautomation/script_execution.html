@@ -4,24 +4,139 @@
     <h1>LAB Automation</h1>
     <form id="script-form" method="post">
         {% csrf_token %}
-        <label for="option">Escolha um laboratorio para aplicar:</label>
-        <select id="option" name="option">
-            <option value="1">LAB 1</option>
-            <option value="2">LAB 2</option>
-            <option value="3">LAB 3</option>
-            <option value="4">LAB 4</option>
-        </select>
-        <button type="submit">Executar</button>
+        <div class="playbooks-container">
+            <div class="playbooks-header">Playbooks de Laboratórios Disponíveis:</div>
+            <div class="playbooks-list">
+                {% if playbooks %}
+                    {% for playbook in playbooks %}
+                        <div class="playbook-item">
+                            <input type="radio" 
+                                   id="playbook-{{ forloop.counter }}" 
+                                   name="playbooks" 
+                                   value="{{ playbook }}">
+                            <label for="playbook-{{ forloop.counter }}">{{ playbook }}</label>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="error-text">Nenhum playbook encontrado ou erro ao acessar o diretório.</p>
+                {% endif %}
+            </div>
+        </div>
+        <button type="submit" {% if not playbooks %}disabled{% endif %}>Executar Selecionado</button>
     </form>
-    <div id="output"></div>
-    <script>
+
+    <!-- Terminal-style output container -->
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span class="terminal-title">Output</span>
+        </div>
+        <div id="output" class="terminal-output"></div>
+    </div>
+
+    <style>
+        .playbooks-container {
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-width: 600px;
+        }
+
+        .playbooks-header {
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+
+        .playbooks-list {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .playbook-item {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .playbook-item input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .playbook-item label {
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: normal;
+        }
+
+        .terminal-container {
+            margin-top: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .terminal-header {
+            background-color: #2d2d2d;
+            padding: 8px 15px;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .terminal-title {
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .terminal-output {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .error-text {
+            color: #ff6b6b;
+        }
+    </style>
+
+   <script>
         document.getElementById('script-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             
+            // Verificar se algum playbook foi selecionado
+            if (!formData.getAll('playbooks').length) {
+                document.getElementById('output').innerHTML = '<span class="error-text">Por favor, selecione pelo menos um playbook.</span>';
+                return;
+            }
+
             // Limpar a saída anterior
             const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '<p>Executando script...</p>';
+            outputDiv.innerHTML = '<span style="color: #4CAF50;">Executando playbooks selecionados...</span>';
 
             fetch('', {
                 method: 'POST',
@@ -29,16 +144,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                const outputDiv = document.getElementById('output');
+                //const outputDiv = document.getElementById('output');
                 if (data.error) {
-                    outputDiv.innerHTML = `<pre style="color: red;">${data.error}</pre>`;
+                    outputDiv.innerHTML = `<span class="error-text">${data.error}</span>`;
                 } else {
                     // Formatar a saída mantendo a formatação e quebrando linhas
-                    outputDiv.innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word;">${data.output}</pre>`;
+                    //outputDiv.innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word;">${data.output}</pre>`;
+                    outputDiv.textContent = data.output;
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
                 }
             })
             .catch(error => {
-                outputDiv.innerHTML = `<pre style="color: red;">Erro na execução: ${error}</pre>`;
+                outputDiv.innerHTML = `<span class="error-text">Erro na execução: ${error}</span>`;
             });
         });
     </script>

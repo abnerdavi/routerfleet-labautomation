@@ -3,19 +3,40 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import subprocess
 
+def get_available_playbooks():
+    try:
+        # Executar comando ls via SSH para listar os playbooks
+        result = subprocess.run(
+            ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", "ls /home/lab/labAutomation/playbooks/*.yml"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        
+        # Processar a saída para obter apenas os nomes dos arquivos
+        playbooks = []
+        for line in result.stdout.strip().split('\n'):
+            if line:  # Ignorar linhas vazias
+                filename = line.split('/')[-1]  # Pega apenas o nome do arquivo
+                playbooks.append(filename)
+        
+        return sorted(playbooks)
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao listar playbooks: {e}")
+        return []
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+        return []
+
 def script_execution(request):
     if request.method == "POST":
-        script_option = request.POST.get("option")
-        scripts = {
-            "1": "pb_lab1.yml",
-            "2": "pb_lab2.yml",
-            "3": "pb_lab3.yml",
-            "4": "pb_lab4.yml",
-        }
-        selected_script = scripts.get(script_option)
-
+        selected_script = request.POST.get("playbooks")
+        
         if selected_script:
             try:
+                combined_output = ""
+                combined_output += f"{'='*50}\nExecutando: {selected_script}\n{'='*50}\n"
+
                 # Executar o script no Bash
                 result = subprocess.run(
                     ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", f"ansible-playbook /home/lab/labAutomation/playbooks/{selected_script}"],
@@ -23,7 +44,6 @@ def script_execution(request):
                     text=True,
                 )
 
-                combined_output = ""
                 if result.stdout:
                     combined_output += result.stdout
                 if result.stderr:
@@ -37,5 +57,6 @@ def script_execution(request):
             except Exception as e:
                 return JsonResponse({"error": str(e)})
         else:
-            return JsonResponse({"error": "Opção inválida"})
-    return render(request, "labautomation/script_execution.html")
+            return JsonResponse({"error": "Nenhum playbook selecionado"})
+    playbooks = get_available_playbooks()
+    return render(request, "labautomation/script_execution.html", {"playbooks": playbooks})
