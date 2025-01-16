@@ -137,3 +137,74 @@ def get_file_content(request):
             return JsonResponse({'error': f'Erro: {str(e)}'})
             
     return JsonResponse({'error': 'Método não permitido'})
+
+def manage_playbooks(request):
+    if request.method == "POST" and request.FILES.get('playbook_file'):
+        try:
+            uploaded_file = request.FILES['playbook_file']
+            
+            # Verificar extensão do arquivo (opcional, para arquivos .yaml ou .yml)
+            if not uploaded_file.name.endswith(('.yaml', '.yml')):
+                return JsonResponse({'error': 'Apenas arquivos YAML (.yaml ou .yml) são permitidos'})
+            
+            # Criar arquivo temporário local
+            temp_path = f'/tmp/{uploaded_file.name}'
+            with open(temp_path, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+            
+            # Copiar arquivo para o servidor remoto via scp
+            scp_command = ["sshpass", "-p", "labredes","scp", temp_path, f"lab@172.18.0.1:/home/lab/labAutomation/playbooks/"]
+            result = subprocess.run(scp_command, capture_output=True, text=True)
+            os.remove(temp_path)
+            
+            if result.returncode != 0:
+                return JsonResponse({'error': f'Erro no upload: {result.stderr}'})
+            
+            return JsonResponse({'success': 'Playbook enviado com sucesso'})
+            
+        except Exception as e:
+            return JsonResponse({'error': f'Erro: {str(e)}'})
+    
+    # Listar playbooks existentes
+    try:
+        result = subprocess.run(
+            ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1","ls -l /home/lab/labAutomation/playbooks/*.yml"],
+            capture_output=True,
+            text=True
+        )
+        
+        files = []
+        if result.returncode == 0:
+            for line in result.stdout.strip().split('\n'):
+                if line:
+                    filename = line.split()[-1].split('/')[-1]
+                    files.append(filename)
+    except Exception as e:
+        files = []
+    
+    return render(request, 'labautomation/playbooks_manager.html', {'files': files})
+
+def get_file_content_2(request):
+    if request.method == "POST":
+        filename = request.POST.get('filename')
+        if not filename:
+            return JsonResponse({'error': 'Nome do arquivo não fornecido'})
+            
+        try:
+            # Ler conteúdo do arquivo via SSH
+            result = subprocess.run(
+                ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", f"cat /home/lab/labAutomation/playbooks/{filename}"],
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode == 0:
+                return JsonResponse({'content': result.stdout})
+            else:
+                return JsonResponse({'error': f'Erro ao ler arquivo: {result.stderr}'})
+                
+        except Exception as e:
+            return JsonResponse({'error': f'Erro: {str(e)}'})
+            
+    return JsonResponse({'error': 'Método não permitido'})

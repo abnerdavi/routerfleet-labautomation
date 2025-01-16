@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Gerenciador de LABORATÓRIOS (PLAYBOOKS)</h1>
+    
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <h2>Upload de Arquivo</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="playbook_file" name="playbook_file" accept=".yml" required>
+            <button type="submit">Enviar Arquivo</button>
+        </form>
+        <div id="upload-status"></div>
+    </div>
+
+    <!-- Files Section -->
+    <div class="files-container">
+        <div class="files-list">
+            <h2>Arquivos Disponíveis</h2>
+            <div class="files-grid">
+                {% if files %}
+                    {% for file in files %}
+                        <div class="file-item" onclick="viewFileContent('{{ file }}')">
+                            <i class="file-icon">📄</i>
+                            <span class="file-name">{{ file }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Nenhum arquivo .yml encontrado</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- File Content Viewer -->
+        <div class="content-viewer">
+            <div class="viewer-header">
+                <span class="viewer-title">Conteúdo do Arquivo</span>
+            </div>
+            <div id="file-content" class="viewer-content">
+                Selecione um arquivo para visualizar seu conteúdo
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .upload-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    #upload-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .files-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+    }
+
+    .files-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .file-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        background-color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .file-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .file-icon {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .file-name {
+        font-size: 14px;
+        text-align: center;
+        word-break: break-word;
+    }
+
+    .content-viewer {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .viewer-header {
+        background-color: #2d2d2d;
+        padding: 10px 15px;
+        color: white;
+    }
+
+    .viewer-content {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        padding: 15px;
+        min-height: 500px;
+        max-height: 500px;
+        overflow-y: auto;
+        font-family: 'Courier New', Courier, monospace;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    button {
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    #upload-status {
+        margin-top: 10px;
+    }
+
+    .error-text {
+        color: #ff6b6b;
+    }
+
+    .success-text {
+        color: #4CAF50;
+    }
+</style>
+
+<script>
+    // Função para visualizar conteúdo do arquivo
+    function viewFileContent(filename) {
+        const contentDiv = document.getElementById('file-content');
+        contentDiv.textContent = 'Carregando...';
+        
+        const formData = new FormData();
+        formData.append('filename', filename);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch('/labautomation/get_file_content_2/', { 
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                contentDiv.innerHTML = `<span class="error-text">${data.error}</span>`;
+            } else {
+                contentDiv.textContent = data.content;
+            }
+        })
+        .catch(error => {
+            contentDiv.innerHTML = `<span class="error-text">Erro ao carregar arquivo: ${error}</span>`;
+        });
+    }
+
+    // Handler para upload de arquivo
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const statusDiv = document.getElementById('upload-status');
+        
+        statusDiv.innerHTML = '<span>Enviando arquivo...</span>';
+        
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                statusDiv.innerHTML = `<span class="error-text">${data.error}</span>`;
+            } else {
+                statusDiv.innerHTML = `<span class="success-text">${data.success}</span>`;
+                // Recarregar a página para atualizar a lista de arquivos
+                setTimeout(() => location.reload(), 1500);
+            }
+        })
+        .catch(error => {
+            statusDiv.innerHTML = `<span class="error-text">Erro no upload: ${error}</span>`;
+        });
+    });
+</script>
+{% endblock %}
