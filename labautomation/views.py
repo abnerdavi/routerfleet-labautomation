@@ -78,11 +78,7 @@ def manage_rsc_files(request):
                     destination.write(chunk)
             
             # Copiar arquivo para o servidor remoto via scp
-            scp_command = [
-                "sshpass", "-p", "labredes",
-                "scp", temp_path,
-                f"lab@172.18.0.1:/home/user/lab/labAutomation/mktk-configs/"
-            ]
+            scp_command = ["sshpass", "-p", "labredes","scp", temp_path, f"lab@172.18.0.1:/home/lab/labAutomation/mktk-configs/"]
             
             result = subprocess.run(scp_command, capture_output=True, text=True)
             
@@ -100,8 +96,7 @@ def manage_rsc_files(request):
     # Listar arquivos existentes
     try:
         result = subprocess.run(
-            ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", 
-             "ls -l /home/user/lab/labAutomation/mktk-configs/*.rsc"],
+            ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1","ls -l /home/lab/labAutomation/mktk-configs/*.rsc"],
             capture_output=True,
             text=True
         )
@@ -128,8 +123,7 @@ def get_file_content(request):
         try:
             # Ler conteúdo do arquivo via SSH
             result = subprocess.run(
-                ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", 
-                 f"cat /home/user/lab/labAutomation/mktk-configs/{filename}"],
+                ["sshpass", "-p", "labredes", "ssh", "lab@172.18.0.1", f"cat /home/lab/labAutomation/mktk-configs/{filename}"],
                 capture_output=True,
                 text=True
             )

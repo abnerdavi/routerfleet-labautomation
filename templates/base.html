@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% if page_title %}{{ page_title }} | {% endif %}routerfleet</title>
+    <title>{% if page_title %}{{ page_title }} | {% endif %}LAB Automation</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -69,7 +69,7 @@
                 <a href="/" class="nav-link">Home</a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="/status/" class="nav-link">Status</a>
+                <a href="/labautomation/script_execution" class="nav-link">LAB Automation</a>
             </li>
         </ul>
 
@@ -88,7 +88,7 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-            <span class="brand-text font-weight-light">LabAutomation</span>
+            <span class="brand-text font-weight-light">LAB Automation</span>
         </a>
 
         <!-- Sidebar -->
@@ -105,7 +105,7 @@
                             </p>
                         </a>
                     </li>
-
+<!--
                     <li class="nav-item">
                         <a href="/status/" class="nav-link {% if '/status/' in request.path %}active{% endif %}">
                             <i class="fas fa-tachometer-alt nav-icon"></i>
@@ -134,7 +134,7 @@
                             </p>
                         </a>
                     </li>
-
+ -->
                     <li class="nav-item">
                         <a href="/user/list/" class="nav-link {% if '/user/' in request.path %}active{% endif %}">
                             <i class="fas fa-users nav-icon"></i>
@@ -145,7 +145,7 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a href="/labautomation/script_execution" class="nav-link {% if '/labautomation/' in request.path %}active{% endif %}">
+                        <a href="/labautomation/script_execution/" class="nav-link {% if '/labautomation/script_execution/' in request.path %}active{% endif %}">
                             <i class="fas fa-network-wired nav-icon"></i>
                             <p>
                                 LAB Automation
@@ -154,8 +154,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="/labautomation/rsc_manager" class="nav-link {% if '/labautomation/' in request.path %}active{% endif %}">
-                            <i class="fas fa-network-wired nav-icon"></i>
+                        <a href="/labautomation/rsc_manager/" class="nav-link {% if '/labautomation/rsc_manager/' in request.path %}active{% endif %}">
+                            <i class="fas fa-box-open"></i>
                             <p>
                                 Configs. MKTK
                             </p>
@@ -216,7 +216,7 @@
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-        {% if webadmin_version.update_available %}<a class='btn btn-sm btn-danger' id="btn_update_changelog">Update Available</a>{% else %}routerfleet {% endif %}
+        {% if webadmin_version.update_available %}<a class='btn btn-sm btn-danger' id="btn_update_changelog">Update Available</a>{% else %}LAB Automation{% endif %}
         <div class="float-right d-none d-sm-inline-block">
             <b>Version</b> {{ webadmin_version.current_version }}
         </div>

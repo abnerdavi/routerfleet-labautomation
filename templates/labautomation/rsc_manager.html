@@ -170,7 +170,7 @@
         formData.append('filename', filename);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
         
-        fetch('/get_file_content/', {  // Ajuste a URL conforme sua configuração
+        fetch('/labautomation/get_file_content/', {  // Ajuste a URL conforme sua configuração
             method: 'POST',
             body: formData
         })
