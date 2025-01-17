@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Gerenciador do Arquivo Hosts</h1>
+
+    <!-- Visualizar Conteúdo -->
+    <div class="viewer">
+        <h2>Conteúdo do Arquivo Hosts</h2>
+        <pre id="file-content">{{ file_content }}</pre>
+    </div>
+
+    <!-- Substituir Arquivo -->
+    <div class="upload-section">
+        <h2>Substituir Arquivo Hosts</h2>
+        <form id="upload-form" enctype="multipart/form-data" method="post">
+            {% csrf_token %}
+            <input type="file" id="hosts_file" name="hosts_file" required>
+            <button type="submit">Substituir</button>
+        </form>
+        <div id="upload-status"></div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const statusDiv = document.getElementById('upload-status');
+
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                statusDiv.innerHTML = `<span style="color: red;">${data.error}</span>`;
+            } else {
+                statusDiv.innerHTML = `<span style="color: green;">${data.success}</span>`;
+                setTimeout(() => location.reload(), 1500);
+            }
+        })
+        .catch(error => {
+            statusDiv.innerHTML = `<span style="color: red;">Erro no upload: ${error}</span>`;
+        });
+    });
+</script>
+{% endblock %}

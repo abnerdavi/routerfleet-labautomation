@@ -208,3 +208,43 @@ def get_file_content_2(request):
             return JsonResponse({'error': f'Erro: {str(e)}'})
             
     return JsonResponse({'error': 'Método não permitido'})
+
+def manage_hosts_file(request):
+    remote_path = "/home/lab/labAutomation/inventory/hosts"
+    temp_path = "/tmp/hosts"
+
+    if request.method == "POST" and request.FILES.get('hosts_file'):
+        try:
+            uploaded_file = request.FILES['hosts_file']
+
+            # Criar arquivo temporário local
+            with open(temp_path, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            # Substituir o arquivo remoto via scp
+            scp_command = ["sshpass", "-p", "labredes","scp", temp_path,f"lab@172.18.0.1:{remote_path}"]
+            result = subprocess.run(scp_command, capture_output=True, text=True)
+            os.remove(temp_path)
+
+            if result.returncode != 0:
+                return JsonResponse({'error': f'Erro no upload: {result.stderr}'})
+
+            return JsonResponse({'success': 'Arquivo hosts substituído com sucesso!'})
+
+        except Exception as e:
+            return JsonResponse({'error': f'Erro: {str(e)}'})
+
+    # Ler o conteúdo do arquivo remoto
+    try:
+        command = f"sshpass -p 'labredes' ssh lab@172.18.0.1 'cat {remote_path}'"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+        if result.returncode == 0:
+            file_content = result.stdout
+        else:
+            file_content = f"Erro ao ler arquivo: {result.stderr}"
+    except Exception as e:
+        file_content = f"Erro: {str(e)}"
+
+    return render(request, 'labautomation/manage_hosts.html', {'file_content': file_content})

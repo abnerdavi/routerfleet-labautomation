@@ -11,7 +11,7 @@ from backup_data.views import view_generate_backup_schedule, view_create_backup_
 from routerfleet_tools.views import cron_check_updates
 from message_center.views import view_message_channel_list, view_manage_message_settings, view_manage_message_channel, view_debug_test_messages, view_cron_concatenate_notifications, view_cron_send_messages, view_cron_daily_reports, view_message_history
 from import_tool.views import view_import_tool_list, view_import_csv_file, view_import_details, run_import_task
-from labautomation.views import script_execution, manage_rsc_files, get_file_content, manage_playbooks, get_file_content_2
+from labautomation.views import script_execution, manage_rsc_files, get_file_content, manage_playbooks, get_file_content_2, manage_hosts_file
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -68,4 +68,5 @@ urlpatterns = [
     path('labautomation/get_file_content/', get_file_content, name='get_file_content'),
     path('labautomation/playbooks_manager/', manage_playbooks, name='manage_playbooks'),
     path('labautomation/get_file_content_2/', get_file_content_2, name='get_file_content_2'),
+    path('labautomation/manage-hosts/', manage_hosts_file, name='manage_hosts_file'),
 ]
